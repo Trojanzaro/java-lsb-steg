@@ -26,7 +26,7 @@ public class JavaLSBSteg {
 
         // After we import the payload file we create the new image that we will need to
         // export all our information in
-        BufferedImage imgOut = new BufferedImage(img.getWidth(), img.getHeight(), BufferedImage.TYPE_INT_ARGB);
+        BufferedImage imgOut = new BufferedImage(img.getWidth(), img.getHeight(), BufferedImage.TYPE_INT_RGB);
 
         // LSB STEGANOGRAPHY
         int count = 0; // this is the counter for the payload file, so that it injects the bytes one by one
