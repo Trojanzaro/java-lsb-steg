@@ -1,5 +1,11 @@
+import java.io.IOException;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.DataInputStream;
+
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
-import java.io.*;
+import java.awt.image.RenderedImage;
 
 import javax.imageio.ImageIO;
 
@@ -26,28 +32,22 @@ public class JavaLSBSteg {
 
         // After we import the payload file we create the new image that we will need to
         // export all our information in
-        BufferedImage imgOut = new BufferedImage(img.getWidth(), img.getHeight(), BufferedImage.TYPE_INT_RGB);
+        BufferedImage imgOut = new BufferedImage(img.getWidth(), img.getHeight(), BufferedImage.TYPE_4BYTE_ABGR);
 
         // LSB STEGANOGRAPHY
         int count = 0; // this is the counter for the payload file, so that it injects the bytes one by one
         for (int i = 0; i < img.getWidth(); i++) {
             for (int j = 0; j < img.getHeight(); j++) {
                 if (count < file.length()) {
-                    int rgbIn = img.getRGB(i, (j++)); // Get the 24-Bit Pixel
-                    int rgbIn2 = img.getRGB(i, j); // Get Reference bellow comment
-                    // while injecting the file, mask the byte into the new 24-Bit Pixel
+                    int rgbIn = img.getRGB(i, j); // Get the 24-Bit Pixel
+                    // while injecting the file, mask the byte into the new 24-Bit Pixel, two at a time
                     // Ok look, I was High af when I wrote this ok I'll exaplain later
-                    int nib_LL = fileData[count] & 0x03;
-                    int nib_LH = fileData[count] >> 2 & 0x03;
-                    int nib_HL = fileData[count] >> 4 & 0x03;
-                    int nib_HH = fileData[count] >> 6 & 0x03;
-                    int rgbOut = (0xff000000 | (nib_LH << 8 | nib_LL) | (rgbIn & 0xfffffcfc)); // x->ff `ff fc /*3 Low bits on 'g' and 'b'*/`  
-                    int rgbOut2 = (0xff000000 | (nib_HH << 8 | nib_HL) | (rgbIn2 & 0xffffcfc)); // x->ff `ff fc /*3 Low bits on 'g' and 'b'*/`  of next pixel
-                    imgOut.setRGB(i, j-1, rgbOut);
-                    imgOut.setRGB(i, j, rgbOut2);
-                    //System.out.printf("d: %x\nPixel1: %x sPixel1: %x\n", fileData[count], rgbIn, rgbOut);
-                    //System.out.printf("Pixel2: %x sPixel2: %x\n", rgbIn2, rgbOut2);
-                    //System.out.println();
+                    int nib_LL = fileData[count] & 0x3;
+                    int nib_LH = fileData[count] >> 2 & 0x3;
+                    int nib_HL = fileData[count] >> 4 & 0x3;
+                    int nib_HH = fileData[count] >> 6 & 0x3;
+                    int rgbOut = (rgbIn & 0xfcfcfcfc) | ((nib_HH << 24) | (nib_HL << 16) | (nib_LH << 8) | (nib_LL)); // nibble a byte into 2-bit sub nibbles and replace the last two bits of every channel (Red Green Blue Alpha) 
+                    imgOut.setRGB(i, j, rgbOut);
                     count++;
                 } else {
                     //when file is finished reading, then load the rest of the image normaly
@@ -56,8 +56,7 @@ public class JavaLSBSteg {
                 }
             }
         }
-
-        ImageIO.write(imgOut, "BMP", new File("./out_s_" + file.length() + "_s_.bmp"));
+        ImageIO.write(imgOut, "png", new File("./out_s_" + file.length() + "_s_.png"));
         System.out.println("Steganography of file size: " + file.length());
     }
 }

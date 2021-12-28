@@ -12,23 +12,21 @@ public class JavaLSBStegRev {
         BufferedImage img = null;
         img = ImageIO.read(in);
 
-        FileOutputStream fout = new FileOutputStream("./testoutput");
+        FileOutputStream fout = new FileOutputStream("./export.out");
 
         int count = 0;
         for (int i = 0; i < img.getWidth(); i++) {
             for (int j = 0; j < img.getHeight(); j++) {
                 if (count < fileSize) {
-                    int rgb = img.getRGB(i, (j++));
-                    int rgb2 = img.getRGB(i, j);
+                    int rgb = img.getRGB(i, j);
                     int nib_LL = (rgb & 0x00000003);
                     int nib_LH = (rgb & 0x00000300) >> 8;
-                    int nib_HL = (rgb2 & 0x00000003);
-                    int nib_HH = (rgb2 & 0x00000300) >> 8;
+                    int nib_HL = (rgb & 0x00030000) >> 16;
+                    int nib_HH = (rgb & 0x03000000) >> 24;
                     int data = 0x000000ff & ((nib_HH << 6) | 
                                              (nib_HL << 4) | 
                                              (nib_LH << 2) | 
                                              (nib_LL));
-                    //System.out.printf("d: %x\nLL: %x LH: %x HL: %x HH: %x \n", data, nib_LL, nib_LH, nib_HL, nib_HH);
                                              
                     fout.write(data);
                     count++;
