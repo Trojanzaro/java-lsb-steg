@@ -3,9 +3,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.DataInputStream;
 
-import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
-import java.awt.image.RenderedImage;
 
 import javax.imageio.ImageIO;
 
