@@ -39,7 +39,6 @@ public class JavaLSBSteg {
                 if (count < file.length()) {
                     int rgbIn = img.getRGB(i, j); // Get the 32-Bit Pixel
                     // while injecting the file, mask the byte into the new 32-Bit Pixel,
-                    // Ok look, I was High af when I wrote this ok I'll exaplain later
                     int nib_LL = fileData[count] & 0x3;
                     int nib_LH = fileData[count] >> 2 & 0x3;
                     int nib_HL = fileData[count] >> 4 & 0x3;
