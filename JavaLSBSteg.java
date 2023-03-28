@@ -10,6 +10,8 @@ import java.io.FilenameFilter;
 import java.awt.Frame;
 import javax.imageio.ImageIO;
 
+import java.util.regex.*;
+
 /**
  * This class provides two tools for injecting and extracting files into images using LSB Steganography
  *
@@ -45,12 +47,10 @@ public class JavaLSBSteg {
         fileDialog.setFile("");
         fileDialog.setVisible(true);
         String payloadFile = fileDialog.getDirectory() + fileDialog.getFile();
-        if (imageFile == null || payloadFile == null) {
-            System.out.println("Files not selected! please select files");
-            System.exit(1);
-        } else {
+        if (imageFile == null || payloadFile == null)
+           throw new IOException("Files not selected! please select files");
+        else
             inject(imageFile, payloadFile);
-        }
         fileDialog.dispose();
         frm.dispose();
         
@@ -69,17 +69,19 @@ public class JavaLSBSteg {
         FileDialog fileDialog = new FileDialog(frm,"Select image");
         fileDialog.setVisible(true);
         String imageFile = fileDialog.getDirectory() + fileDialog.getFile();
+
+        //Get payload size from filename
+        Pattern p = Pattern.compile("_s_[0-9]+_s_");
+        Matcher m = p.matcher(fileDialog.getFile());
+        if(!m.find()) throw new IllegalArgumentException("File name must contain: _s_<payload_size>_s_");
+        int payloadSize = Integer.parseInt(m.group().split("_s_")[1]);
         
-        fileDialog.setTitle("Select file to hide");
-        fileDialog.setFile("");
-        fileDialog.setVisible(true);
-        String payloadFile = fileDialog.getDirectory() + fileDialog.getFile();
-        if (imageFile == null || payloadFile == null) {
-            System.out.println("Files not selected! please select files");
-            System.exit(1);
-        } else {
-            inject(imageFile, payloadFile);
-        }
+        //Extract!
+        if (imageFile == null || payloadSize == 0)
+            throw new IOException("Files not selected! please select files");
+        else
+            extract(imageFile, fileDialog.getDirectory()+"/export.out",payloadSize);
+
         fileDialog.dispose();
         frm.dispose();
         
@@ -166,7 +168,6 @@ public class JavaLSBSteg {
      */
     private static void extract(String payloadFile, String outputFile, int payloadSize) throws IOException {
         File in = new File(payloadFile);
-        int fileSize = payloadSize;
 
         BufferedImage img = null;
         img = ImageIO.read(in);
@@ -176,7 +177,7 @@ public class JavaLSBSteg {
         int count = 0;
         for (int i = 0; i < img.getWidth(); i++) {
             for (int j = 0; j < img.getHeight(); j++) {
-                if (count < fileSize) {
+                if (count < payloadSize) {
                     int rgb = img.getRGB(i, j);
                     int nib_LL = (rgb & 0x00000003);
                     int nib_LH = (rgb & 0x00000300) >> 8;
