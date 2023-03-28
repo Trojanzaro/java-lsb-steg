@@ -29,12 +29,12 @@ javac *.java
 
 To hide a file into an image:
 ```
-java JavaLSBSteg "<image>" "<file_to_hide>"
+java MainClass -h
 ```
 
 To extract hidden info from file:
 ```
-java JavaLSBStegRev "out_s_<size_in_byte_of_hidden_data>_s_.png"
+java MainClass -e
 ```
 
 Since all of the data required to extract the information can be abstracted the program can be altered to retrieve the size of the hidden info another way
