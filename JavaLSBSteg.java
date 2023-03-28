@@ -47,7 +47,7 @@ public class JavaLSBSteg {
         fileDialog.setFile("");
         fileDialog.setVisible(true);
         String payloadFile = fileDialog.getDirectory() + fileDialog.getFile();
-        if (imageFile == null || payloadFile == null)
+        if (imageFile.equals("nullnull") || payloadFile.equals("nullnull"))
            throw new IOException("Files not selected! please select files");
         else
             inject(imageFile, payloadFile);
@@ -77,7 +77,7 @@ public class JavaLSBSteg {
         int payloadSize = Integer.parseInt(m.group().split("_s_")[1]);
         
         //Extract!
-        if (imageFile == null || payloadSize == 0)
+        if (imageFile.equals("nullnull") || payloadSize == 0)
             throw new IOException("Files not selected! please select files");
         else
             extract(imageFile, fileDialog.getDirectory()+"/export.out",payloadSize);
